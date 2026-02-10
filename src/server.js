@@ -1,6 +1,16 @@
 const http = require('node:http');
+const routes = require('./routes');
+const error = require('./error');
 
 http.createServer(function (request, response) {
-    response.writeHead(200, {'content-type': 'application/json; charset=utf-8'});
-    response.end(JSON.stringify({message: 'Hello Client!'}));
+    const route = routes.find(function (route) {
+        return request.url === route.endpoint;
+    });
+
+    if (route){
+        route.handler(response);
+        return;
+    }
+
+    error.notFound(response);
 }).listen(3000);
